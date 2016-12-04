@@ -107,16 +107,14 @@ var parser = {
         str = this.multiple(str, /(^|^[&#36;A-z\s|]+\s|^&#35;[A-z0-9]+\s|^[&#36;A-z\s|]+&#35;[A-z]+\s|<br>)\s?&gt;(.*?)(<br>|$)/g, '$1<span style="color:#789922;">>$2</span><br>');
         
         //styles
-        str = this.multiple(str, /\/\^([^\|]+)\|?/g, '<big>$1</big>');
-        str = this.multiple(str, /\/\*([^\|]+)\|?/g, '<b>$1</b>');
-        str = this.multiple(str, /\/\%([^\|]+)\|?/g, '<i>$1</i>');
-        str = this.multiple(str, /\/\_([^\|]+)\|?/g, '<u>$1</u>');
-        str = this.multiple(str, /\/\-([^\|]+)\|?/g, '<strike>$1</strike>');
-        str = this.multiple(str, /\/\&#126;([^\|]+)\|?/g, '<small>$1</small>');
-        str = this.multiple(str, /\/\&#35;([^\|]+)\|?/g, '<span class="spoil">$1</span>');
-        str = this.multiple(str, /\/\@([^\|]+)\|?/g, '<span style="text-shadow: 0 0 2px white;color: transparent;">$1</span>');
-        str = this.multiple(str, /\/\+([^\|]+)\|?/g, '<span class="shake">$1</span>');
-        str = this.multiple(str, /\/\!([^\|]+)\|?/g, '<span class="glow">$1</span>');
+        str = this.multiple(str, /\/\^([^\|]+)\|?/g, '<big>$1</big>', 6);
+        str = this.multiple(str, /\/\*([^\|]+)\|?/g, '<b>$1</b>', 6);
+        str = this.multiple(str, /\/\%([^\|]+)\|?/g, '<i>$1</i>', 6);
+        str = this.multiple(str, /\/\_([^\|]+)\|?/g, '<u>$1</u>', 6);
+        str = this.multiple(str, /\/\-([^\|]+)\|?/g, '<strike>$1</strike>', 6);
+        str = this.multiple(str, /\/\&#126;([^\|]+)\|?/g, '<small>$1</small>', 6);
+        str = this.multiple(str, /\/\&#35;([^\|]+)\|?/g, '<span class="spoil">$1</span>', 6);
+        str = this.multiple(str, /\/\@([^\|]+)\|?/g, '<span style="text-shadow: 0 0 2px white;color: transparent;">$1</span>', 6);
         
         // Replace colors
         str = this.multiple(str, /&#35;&#35;&#35;([\da-f]{6}|[\da-f]{3})(.+)$/i, '<span style="text-shadow: 0px 0px 20px #$1,0px 0px 20px #$1,0px 0px 20px #$1,0px 0px 20px #$1;">$2</span>');
@@ -144,7 +142,6 @@ var parser = {
             for(var i in check){
                 var number = check[i].replace('>&gt;', '');
                 var found = document.getElementsByClassName('msg-' + number);
-                console.log(found.length);
                 if (found.length) {
                     str = str.replace(check[i], '<a onmouseenter="parser.showQuote(' + number + ');" onmouseout="document.body.removeChild(document.getElementById(\'qoute\'));" onclick="parser.highlight(' + number + ')">&gt;&gt;' + number + '</a>');
                 } else {
@@ -164,8 +161,8 @@ var parser = {
         str = str.replace(/<a [^>]*href="[^"]*ustream.tv\/embed\/(\d+)\?v=3&amp;wmode=direct">([^<]*)<\/a>/, '<a target="_blank" href="$2">$2</a> <a href="javascript:void(0)" onclick="embed(\'ustream\', \'$1\')" class="show-video">[video]</a>');          
         
         var img = /(<a target="_blank" href="[^"]+?">)([^<]+?\.(?:agif|apng|gif|jpg|jpeg|png|bmp|svg))<\/a>/gi.exec(str);
-        if (img) {
-            str = this.multiple(str, img[0], img[1] + '<img src="' + img[2] + '" onload="scrollToBottom(\'messages\');"/></a>', 3);
+        if (img && Attributes.get('toggle-images')) {
+            str = this.multiple(str, img[0], img[1] + '<img src="' + img[2] + '" onload="messageBuilder.scrollToBottom(\'messages\');"/></a>', 3);
         }
         
         //replace normalied text
